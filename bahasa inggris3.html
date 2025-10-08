@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Urutkan Kata Bahasa Inggris</title>
+<style>
+    body {
+        background-color: #064e3b; /* hijau tua */
+        font-family: Arial, sans-serif;
+        color: #fff;
+        text-align: center;
+        padding: 30px;
+    }
+
+    .container {
+        background-color: #a7f3d0; /* hijau muda */
+        padding: 20px;
+        border-radius: 15px;
+        width: 60%;
+        margin: auto;
+        box-shadow: 0 0 15px rgba(0,0,0,0.3);
+    }
+
+    h1 {
+        color: #064e3b;
+    }
+
+    .words {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        margin-bottom: 20px;
+    }
+
+    .word {
+        background-color: #ffffff;
+        color: #064e3b;
+        margin: 5px;
+        padding: 10px 15px;
+        border-radius: 10px;
+        cursor: grab;
+        font-weight: bold;
+        user-select: none;
+    }
+
+    textarea {
+        width: 90%;
+        height: 60px;
+        font-size: 18px;
+        border-radius: 10px;
+        border: 2px solid #064e3b;
+        padding: 10px;
+        color: #064e3b;
+        background-color: #ffffff; /* teks area putih */
+    }
+
+    .buttons {
+        margin-top: 20px;
+    }
+
+    button {
+        background-color: #064e3b;
+        color: white;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 10px;
+        cursor: pointer;
+        margin: 5px;
+        font-size: 16px;
+    }
+
+    button:hover {
+        background-color: #047857;
+    }
+
+    #feedback {
+        margin-top: 15px;
+        font-size: 18px;
+        font-weight: bold;
+    }
+</style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Susun Kata Bahasa Inggris!</h1>
+    <p>Seret dan jatuhkan kata-kata berikut ke area di bawah untuk membentuk kalimat yang benar:</p>
+    <div class="words" id="wordContainer"></div>
+
+    <textarea id="sentenceArea" placeholder="Seret kata ke sini..." ondrop="drop(event)" ondragover="allowDrop(event)"></textarea>
+
+    <div class="buttons">
+        <button onclick="checkAnswer()">Hasil</button>
+        <button onclick="resetGame()">Reset</button>
+    </div>
+
+    <div id="feedback"></div>
+</div>
+
+<script>
+    const correctSentence = "I am going to the market";
+    let words = ["I", "am", "going", "to", "the", "market"];
+
+    // Fungsi untuk mengacak kata
+    function shuffle(array) {
+        for (let i = array.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [array[i], array[j]] = [array[j], array[i]];
+        }
+        return array;
+    }
+
+    function displayWords() {
+        const container = document.getElementById("wordContainer");
+        container.innerHTML = "";
+        shuffle(words).forEach(word => {
+            const span = document.createElement("div");
+            span.className = "word";
+            span.textContent = word;
+            span.draggable = true;
+            span.ondragstart = drag;
+            container.appendChild(span);
+        });
+    }
+
+    function allowDrop(ev) {
+        ev.preventDefault();
+    }
+
+    function drag(ev) {
+        ev.dataTransfer.setData("text", ev.target.textContent);
+        ev.target.style.opacity = "0.5";
+    }
+
+    function drop(ev) {
+        ev.preventDefault();
+        const word = ev.dataTransfer.getData("text");
+        const area = document.getElementById("sentenceArea");
+        area.value += (area.value ? " " : "") + word;
+        
+        // Hilangkan kata yang sudah di-drop
+        const wordsDiv = document.querySelectorAll(".word");
+        wordsDiv.forEach(w => {
+            if (w.textContent === word && w.style.opacity === "0.5") {
+                w.style.display = "none";
+            }
+        });
+    }
+
+    function checkAnswer() {
+        const userAnswer = document.getElementById("sentenceArea").value.trim();
+        const feedback = document.getElementById("feedback");
+        if (userAnswer === correctSentence) {
+            feedback.textContent = "Hebat! Jawaban Anda benar ✅";
+            feedback.style.color = "green";
+        } else {
+            feedback.textContent = "Maaf, jawaban Anda salah. Ulangi lagi ❌";
+            feedback.style.color = "red";
+        }
+    }
+
+    function resetGame() {
+        document.getElementById("sentenceArea").value = "";
+        document.getElementById("feedback").textContent = "";
+        displayWords();
+    }
+
+    // Inisialisasi game
+    displayWords();
+</script>
+
+</body>
+</html>
